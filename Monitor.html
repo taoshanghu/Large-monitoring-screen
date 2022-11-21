@@ -1,0 +1,638 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+  <title>Monitor</title>
+  <meta http-equiv="Refresh" content="900"/>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta http-Equiv="Cache-Control" Content="no-cache">
+  <meta http-Equiv="Pragma" Content="no-cache">
+  <meta http-Equiv="Expires" Content="0">
+  <style type="text/css">
+    html, body {
+      width: 100%;
+      height: 100%
+    }
+
+    body {
+      font-size: 12px;
+    }
+
+    .frame_style {
+      border: 0;
+      margin: 0 auto;
+    }
+
+    .button_div {
+      position: absolute;
+      border: 1px solid #000000;
+      background-color: #CCEEFF;
+      text-align: center;
+      filter: alpha(opacity:90);
+      opacity: 0.9;
+      -moz-opacity: 0.9;
+      -khtml-opacity: 0.9;
+    }
+
+    .buttom_title {
+      background-color: #0066FF;
+      height: 22px;
+      width: 30px;
+      float: left;
+      color: #FFFFFF;
+      font-size: 16px;
+      text-align: left;
+    }
+
+    .buttom_hint {
+      background-color: #0066FF;
+      height: 22px;
+      color: red;
+      font-weight: normal;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .button {
+      height: 25px;
+      font-size: 14px;
+      background: #EEFFBB;
+      border: 1px solid #cccccc;
+      color: #FF0000;
+    }
+  </style>
+  <script type="text/javascript">
+    var mouseX, mouseY;
+    var objX, objY;
+    var isDowm = false;
+
+    function mouseDown(obj, e) {
+      obj.style.cursor = "move";
+      objX = obj.style.left;
+      objY = obj.style.top;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      isDowm = true;
+    }
+
+    function mouseMove(obj, e) {
+      var x = e.clientX;
+      var y = e.clientY;
+      if (isDowm) {
+        obj.style.bottom = '';
+        obj.style.right = '';
+        obj.style.left = parseInt(objX) + parseInt(x) - parseInt(mouseX) + "px";
+        obj.style.top = parseInt(objY) + parseInt(y) - parseInt(mouseY) + "px";
+      }
+    }
+
+    function mouseUp(obj, e) {
+      if (isDowm) {
+        var x = e.clientX;
+        var y = e.clientY;
+        obj.style.bottom = '';
+        obj.style.right = '';
+        obj.style.left = (parseInt(x) - parseInt(mouseX) + parseInt(objX)) + "px";
+        obj.style.top = (parseInt(y) - parseInt(mouseY) + parseInt(objY)) + "px";
+        mouseX = x;
+        obj.style.cursor = "default";
+        isDowm = false;
+      }
+    }
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    function giveHint(text) {
+      $("hint").innerHTML = text;
+    }
+
+    {
+      Object.prototype.addClassName = function (newClassName) {
+        if (!this.className === 'undefine') {
+          alert("className undefined!");
+          return;
+        }
+        var p = this.className.split(" ");
+        for (var i = 0; i < p.length; i++) {
+          if (p[i] === newClassName) {
+            return;
+          }
+        }
+        p[p.length] = newClassName;
+        this.className = p.join(" ");
+      };
+
+      Object.prototype.removeClassName = function (oldClassName) {
+        if (!this.className === 'undefine') {
+          alert("className undefined!");
+          return;
+        }
+        var p = this.className.split(" ");
+        var np = [];
+        var j = 0;
+        for (var i = 0; i < p.length; i++) {
+          if (p[i] !== oldClassName) {
+            np[j++] = p[i];
+          }
+        }
+        this.className = np.join(" ");
+      };
+
+      Object.prototype.hasClassName = function (clsName) {
+        if (!this.className === 'undefine') {
+          alert("className undefined!");
+          return false;
+        }
+        var p = this.className.split(" ");
+        var np = [];
+        var j = 0;
+        for (var i = 0; i < p.length; i++) {
+          if (p[i] === clsName) {
+            return true;
+          }
+        }
+        return false;
+      };
+    }
+
+    var request = {
+      getParameter: function (key) {
+        var encodeUrl = decodeURI(decodeURI(window.location.href));
+        var uri = encodeUrl.substr(encodeUrl.indexOf("?"));
+        var re = new RegExp("" + key + "=([^&?]*)", "ig");
+        var value = ((uri.match(re)) ? (uri.match(re)[0].substr(key.length + 1))
+            : null);
+        return value == null ? null : unescape(value);
+      },
+
+      getParameterValues: function (key) {
+        var encodeUrl = decodeURI(decodeURI(window.location.href));
+        var uri = encodeUrl.substr(encodeUrl.indexOf("?"));
+        var keyvalue = uri.split("&", -1);
+        var len = key.length + 1;
+        var values = [];
+        for (var i = 0; i < keyvalue.length; i++) {
+          if (keyvalue[i].length > len && keyvalue[i].substr(0, len) === key + "=") {
+            values[values.length] = unescape(keyvalue[i].substr(len));
+          }
+        }
+        return values;
+      },
+
+      getParameterNames: function () {
+        var encodeUrl = decodeURI(decodeURI(window.location.href));
+        var idx = encodeUrl.indexOf("?");
+        if (idx === -1 || idx === encodeUrl.length) {
+          return null;
+        }
+        var params = encodeUrl.split("?", -1)[1];
+        var keyvalue = params.split("&", -1);
+        var values = new Set();
+        for (var i = 0; i < keyvalue.length; i++) {
+          if (keyvalue[i].indexOf("=") > 0) {
+            var name = keyvalue[i].substr(0, keyvalue[i].indexOf("="));
+            values.add(name);
+          }
+        }
+        return Array.from(values);
+      }
+    };
+  </script>
+  <script type="text/javascript">
+    function PageLayer(data) {
+      if (window.innerWidth) {
+        this.winWidth = window.innerWidth;
+      } else if ((document.body) && (document.body.clientWidth)) {
+        this.winWidth = document.body.clientWidth;
+      }
+      if (window.innerHeight) {
+        this.winHeight = window.innerHeight;
+      } else if ((document.body) && (document.body.clientHeight)) {
+        this.winHeight = document.body.clientHeight;
+      }
+      if (document.documentElement && document.documentElement.clientHeight && document.documentElement.clientWidth) {
+        this.winHeight = document.documentElement.clientHeight;
+        this.winWidth = document.documentElement.clientWidth;
+      }
+      this.winHeight = this.winHeight - 20;
+      this.obj = document.createElement("div");
+      document.body.appendChild(this.obj);
+      this.pages = data;
+      this.normal = true;
+      this.blocked = false;
+      this.currentPageIdx = 0;
+      this.initButton();
+      this.init();
+    };
+
+    PageLayer.prototype.init = function () {
+      for (var pageIdx = 0; pageIdx < this.pages.length; pageIdx++) {
+        if (this.pages[pageIdx].type === 1) { //火
+          this.getHTML1(pageIdx);
+        } else if (this.pages[pageIdx].type === 2) { //火火
+          this.getHTML2(pageIdx);
+        } else if (this.pages[pageIdx].type === 3) { //炎
+          this.getHTML3(pageIdx);
+        } else if (this.pages[pageIdx].type === 4) { //燚
+          this.getHTML4(pageIdx);
+        } else if (this.pages[pageIdx].type === 6) { //燚炎
+          this.getHTML6(pageIdx);
+        } else {
+          alert("invalid Monitor Page, type=" + this.pages[pageIdx].type);
+        }
+      }
+      this.changeLayer(0);
+      var pageLayer = this;
+      window.setInterval(function () {
+        pageLayer.changeLayer(1);
+      }, 30 * 1000);
+      this.setAllPageURLs();
+      window.setInterval(function () {
+        pageLayer.setAllPageURLs();
+      }, 5 * 1000);
+    };
+
+    PageLayer.prototype.changeWidth = function (obj) {
+      if (this.normal) {
+        obj.parentNode.style.width = 25 + 'px';
+        obj.parentNode.style.height = 22 + 'px';
+        obj.innerHTML = "[+]";
+      } else {
+        obj.parentNode.style.width = 170 + 'px';
+        obj.parentNode.style.height = 50 + 'px';
+        obj.innerHTML = "[-]";
+      }
+      this.normal = !this.normal;
+    };
+
+    PageLayer.prototype.changeStatus = function (obj) {
+      this.blocked = !this.blocked;
+      obj.value = (this.blocked ? "解锁" : "锁定");
+      giveHint("");
+    };
+
+    PageLayer.prototype.displayLayer = function (pageIdx) {
+      var parent = pageIdx === 0 ? this.pages.length - 1 : pageIdx - 1;
+      var next = pageIdx === this.pages.length - 1 ? 0 : pageIdx + 1;
+      $("layer_" + parent).style.display = "none";
+      $("layer_" + parent).style.visibility = "hidden";
+      $("layer_" + next).style.display = "none";
+      $("layer_" + next).style.visibility = "hidden";
+      $("layer_" + pageIdx).style.display = "";
+      $("layer_" + pageIdx).style.visibility = "visible";
+      giveHint((pageIdx + 1) + "/" + this.pages.length);
+    };
+
+    PageLayer.prototype.changeLayer = function (seq) {
+      if (this.blocked) {
+        giveHint("屏幕已锁定，请先解锁！");
+        return;
+      } else {
+        giveHint("");
+      }
+      this.currentPageIdx += seq;
+      if (this.currentPageIdx > this.pages.length - 1) {
+        this.currentPageIdx = 0;
+      }
+      if (this.currentPageIdx < 0) {
+        this.currentPageIdx = this.pages.length - 1;
+      }
+      this.displayLayer(this.currentPageIdx);
+      for (var i = 0; i < this.pages.length; i++) {
+        this.setPageURLs(i);
+      }
+    };
+
+    PageLayer.prototype.setPageURLs = function (idx) {
+      if (idx !== this.currentPageIdx) {
+        return;
+      }
+      var links = this.pages[idx].links;
+      if (links.length === 0) {
+        return;
+      }
+      var time = Date.now();
+      for (var i = 0; i < links.length; i++) {
+        if (links[i] != null) {
+          var ifrm = $("ifr_" + idx + "_" + (i - (-1)));
+          if (ifrm.src === "") {
+            ifrm.src = links[i].url;
+            links[i].lstUpdate = time;
+          } else if (links[i].reflushTime===0 || (links[i].reflushTime>0 && time - links[i].lstUpdate > links[i].reflushTime)) {
+            if (links[i].url.indexOf("?") > 0) {
+              links[i].lstUpdate = time;
+              ifrm.src = links[i].url + "&mts=" + time;
+            } else {
+              links[i].lstUpdate = time;
+              ifrm.src = links[i].url + "?mts=" + time;
+            }
+          }
+          if (!links[i].zoom || links[i].zoom === 1) {
+            continue;
+          }
+          ifrm.style.position = 'absolute';
+          ifrm.style.transform = 'scale(' + 1 / links[i].zoom + ')';
+          ifrm.style.left = '50%';
+          ifrm.style.top = '50%';
+
+          switch (this.pages[idx].type) {
+            case 1:
+              ifrm.style.width = document.body.clientWidth * links[i].zoom + 'px';
+              ifrm.style.height = document.body.clientHeight * links[i].zoom + 'px';
+              ifrm.style.marginLeft = -1 * document.body.clientWidth * links[i].zoom * 0.5 + "px";
+              ifrm.style.marginTop = -1 * document.body.clientHeight * links[i].zoom * 0.5 + "px";
+              break;
+            case 2:
+              ifrm.style.width = document.body.clientWidth * 0.5 * links[i].zoom + 'px';
+              ifrm.style.height = document.body.clientHeight * links[i].zoom + 'px';
+              ifrm.style.marginLeft = -1 * document.body.clientWidth * 0.5 * links[i].zoom * 0.5 + "px";
+              ifrm.style.marginTop = -1 * document.body.clientHeight * links[i].zoom * 0.5 + "px";
+              break;
+            case 3:
+              ifrm.style.width = document.body.clientWidth * links[i].zoom + 'px';
+              ifrm.style.height = document.body.clientHeight * 0.5 * links[i].zoom + 'px';
+              ifrm.style.marginLeft = -1 * document.body.clientWidth * links[i].zoom * 0.5 + "px";
+              ifrm.style.marginTop = -1 * document.body.clientHeight * 0.5 * links[i].zoom * 0.5 + "px";
+              break;
+            case 4:
+              ifrm.style.width = document.body.clientWidth * 0.5 * links[i].zoom + 'px';
+              ifrm.style.height = document.body.clientHeight * 0.5 * links[i].zoom + 'px';
+              ifrm.style.marginLeft = -1 * document.body.clientWidth * 0.5 * links[i].zoom * 0.5 + "px";
+              ifrm.style.marginTop = -1 * document.body.clientHeight * 0.5 * links[i].zoom * 0.5 + "px";
+              break;
+            case 6:
+              ifrm.style.width = document.body.clientWidth * 0.33 * links[i].zoom + 'px';
+              ifrm.style.height = document.body.clientHeight * 0.5 * links[i].zoom + 'px';
+              ifrm.style.marginLeft = -1 * document.body.clientWidth * 0.33 * links[i].zoom * 0.5 + "px";
+              ifrm.style.marginTop = -1 * document.body.clientHeight * 0.5 * links[i].zoom * 0.5 + "px";
+              break;
+          }
+        }
+      }
+    };
+
+    PageLayer.prototype.setAllPageURLs = function () {
+      for (var i = 0; i < this.pages.length; i++) {
+        this.setPageURLs(i);
+      }
+    };
+
+    PageLayer.prototype.getHTML1 = function (pagenum) {
+      var div = document.createElement("div");
+      div.setAttribute('id', "layer_" + pagenum);
+      div.style.width = document.body.clientWidth + 'px';
+      div.style.display = 'none';
+      div.style.visibility = 'hidden';
+      div.style.border = '0';
+      div.style.overflow = 'hidden';
+      this.obj.appendChild(div);
+
+      var div1 = document.createElement("div");
+      div1.style.width = document.body.clientWidth + 'px';
+      div1.style.height = document.body.clientHeight + 'px';
+      div1.style.overflow = 'hidden';
+      div1.style.float = 'left';
+      div1.style.position = 'relative';
+      div.appendChild(div1);
+
+      var iframe = document.createElement("iframe");
+      iframe.setAttribute("name", "ifr_" + pagenum + "_1");
+      iframe.setAttribute("id", "ifr_" + pagenum + "_1");
+      iframe.setAttribute("class", "frame_style");
+      iframe.setAttribute("frameborder", "0");
+      iframe.style.height = document.body.clientHeight + 'px';
+      iframe.style.width = document.body.clientWidth + 'px';
+      iframe.setAttribute("scrolling", "no");
+      div1.appendChild(iframe);
+    };
+
+    PageLayer.prototype.getHTML2 = function (pagenum) {
+      var div = document.createElement("div");
+      div.setAttribute('id', "layer_" + pagenum);
+      div.style.width = document.body.clientWidth + 'px';
+      div.style.display = 'none';
+      div.style.visibility = 'hidden';
+      div.style.border = '0';
+      div.style.overflow = 'hidden';
+      this.obj.appendChild(div);
+      for (var i = 1; i <= 2; i++) {
+        var div1 = document.createElement("div");
+        div1.style.width = document.body.clientWidth * 0.5 + 'px';
+        div1.style.height = document.body.clientHeight + 'px';
+        div1.style.overflow = 'hidden';
+        div1.style.float = 'left';
+        div1.style.position = 'relative';
+        div.appendChild(div1);
+
+        var iframe = document.createElement("iframe");
+        iframe.setAttribute("name", "ifr_" + pagenum + "_" + i);
+        iframe.setAttribute("id", "ifr_" + pagenum + "_" + i);
+        iframe.setAttribute("class", "frame_style");
+        iframe.setAttribute("frameborder", "0");
+        iframe.style.height = document.body.clientHeight + 'px';
+        iframe.style.width = document.body.clientWidth * 0.5 + 'px';
+        iframe.setAttribute("scrolling", "no");
+        div1.appendChild(iframe);
+      }
+    };
+
+    PageLayer.prototype.getHTML3 = function (pagenum) {
+      var div = document.createElement("div");
+      div.setAttribute('id', "layer_" + pagenum);
+      div.style.width = document.body.clientWidth + 'px';
+      div.style.display = 'none';
+      div.style.visibility = 'hidden';
+      div.style.border = '0';
+      div.style.overflow = 'hidden';
+      this.obj.appendChild(div);
+      for (var i = 1; i <= 2; i++) {
+        var div1 = document.createElement("div");
+        div1.style.width = document.body.clientWidth + 'px';
+        div1.style.height = document.body.clientHeight * 0.5 + 'px';
+        div1.style.overflow = 'hidden';
+        div1.style.float = 'left';
+        div1.style.position = 'relative';
+        div.appendChild(div1);
+
+        var iframe = document.createElement("iframe");
+        iframe.setAttribute("name", "ifr_" + pagenum + "_" + i);
+        iframe.setAttribute("id", "ifr_" + pagenum + "_" + i);
+        iframe.setAttribute("class", "frame_style");
+        iframe.setAttribute("frameborder", "0");
+        iframe.style.height = document.body.clientHeight * 0.5 + 'px';
+        iframe.style.width = document.body.clientWidth + 'px';
+        iframe.setAttribute("scrolling", "no");
+        div1.appendChild(iframe);
+      }
+    };
+
+    PageLayer.prototype.getHTML4 = function (pagenum) {
+      var div = document.createElement("div");
+      div.setAttribute('id', "layer_" + pagenum);
+      div.style.width = document.body.clientWidth + 'px';
+      div.style.display = 'none';
+      div.style.visibility = 'hidden';
+      div.style.border = '0';
+      div.style.overflow = 'hidden';
+      this.obj.appendChild(div);
+      for (var i = 1; i <= 2; i++) {
+        var div1 = document.createElement("div");
+        div1.style.width = document.body.clientWidth * 0.5 + 'px';
+        div1.style.height = document.body.clientHeight + 'px';
+        div1.style.overflow = 'hidden';
+        div1.style.float = 'left';
+        div.appendChild(div1);
+        for (var j = 1; j <= 2; j++) {
+          var divj1 = document.createElement("div");
+          divj1.style.width = document.body.clientWidth * 0.5 + 'px';
+          divj1.style.height = document.body.clientHeight * 0.5 + 'px';
+          divj1.style.overflow = 'hidden';
+          divj1.style.float = 'left';
+          divj1.style.position = 'relative';
+          div1.appendChild(divj1);
+          var iframe = document.createElement("iframe");
+          iframe.setAttribute("name", "ifr_" + pagenum + "_" + ((i - 1) * 2 + j));
+          iframe.setAttribute("id", "ifr_" + pagenum + "_" + ((i - 1) * 2 + j));
+          iframe.setAttribute("class", "frame_style");
+          iframe.setAttribute("frameborder", "0");
+          iframe.style.height = document.body.clientHeight * 0.5 + 'px';
+          iframe.style.width = document.body.clientWidth * 0.5 + 'px';
+          iframe.setAttribute("scrolling", "no");
+          divj1.appendChild(iframe);
+        }
+      }
+    };
+
+    PageLayer.prototype.getHTML6 = function (pagenum) {
+      var div = document.createElement("div");
+      div.setAttribute('id', "layer_" + pagenum);
+      div.style.width = document.body.clientWidth + 'px';
+      div.style.display = 'none';
+      div.style.visibility = 'hidden';
+      div.style.border = '0';
+      div.style.overflow = 'hidden';
+      this.obj.appendChild(div);
+      for (var i = 1; i <= 3; i++) {
+        var div1 = document.createElement("div");
+        div1.style.width = document.body.clientWidth * 0.33 + 'px';
+        div1.style.height = document.body.clientHeight + 'px';
+        div1.style.overflow = 'hidden';
+        div1.style.float = 'left';
+        div.appendChild(div1);
+
+        for (var j = 1; j <= 2; j++) {
+          var divj1 = document.createElement("div");
+          divj1.style.width = document.body.clientWidth * 0.33 + 'px';
+          divj1.style.height = document.body.clientHeight * 0.5 + 'px';
+          divj1.style.overflow = 'hidden';
+          divj1.style.float = 'left';
+          divj1.style.position = 'relative';
+          div1.appendChild(divj1);
+          var iframe = document.createElement("iframe");
+          iframe.setAttribute("name", "ifr_" + pagenum + "_" + ((i - 1) * 2 + j));
+          iframe.setAttribute("id", "ifr_" + pagenum + "_" + ((i - 1) * 2 + j));
+          iframe.setAttribute("class", "frame_style");
+          iframe.setAttribute("frameborder", "0");
+          iframe.style.height = document.body.clientHeight * 0.5 + 'px';
+          iframe.style.width = document.body.clientWidth * 0.33 + 'px';
+          iframe.setAttribute("scrolling", "no");
+          divj1.appendChild(iframe);
+        }
+      }
+    };
+
+    PageLayer.prototype.initButton = function () {
+      var pageLayer = this;
+      var buttonDIV = document.createElement("div");
+      this.obj.parentNode.appendChild(buttonDIV);
+      buttonDIV.style.top = (this.winHeight / 2) + "px";
+      buttonDIV.style.left = ((this.winWidth - 170) / 2) + "px";
+      buttonDIV.style.height = "50px";
+      buttonDIV.style.width = "170px";
+      buttonDIV.style.overflow = "hidden";
+      buttonDIV.addClassName("button_div");
+      buttonDIV.onmousedown = function (e) {
+        mouseDown(this, e || window.event);
+      };
+      buttonDIV.onmousemove = function (e) {
+        mouseMove(this, e || window.event);
+      };
+      buttonDIV.onmouseup = function (e) {
+        mouseUp(this, e || window.event);
+      };
+
+      var titleDIV = document.createElement("div");
+      titleDIV.addClassName("buttom_title");
+      titleDIV.onclick = function (ev) {
+        pageLayer.changeWidth(this);
+      };
+      titleDIV.innerHTML = "[-]";
+      buttonDIV.appendChild(titleDIV);
+
+      var hintDiv = document.createElement("div");
+      hintDiv.addClassName("buttom_hint");
+      hintDiv.setAttribute("id", "hint");
+      buttonDIV.appendChild(hintDiv);
+
+      var lineDiv = document.createElement("div");
+      lineDiv.style.height = "0px";
+      buttonDIV.appendChild(lineDiv);
+      var prevButton = document.createElement("INPUT");
+      prevButton.addClassName("button");
+      prevButton.style.width = "50px";
+      prevButton.value = "←";
+      prevButton.setAttribute("type", "button");
+      prevButton.onclick = function (ev) {
+        pageLayer.changeLayer(-1);
+      };
+      buttonDIV.appendChild(prevButton);
+
+      var lockButton = document.createElement("INPUT");
+      lockButton.addClassName("button");
+      lockButton.style.width = "50px";
+      lockButton.value = "锁定";
+      lockButton.setAttribute("type", "button");
+      lockButton.onclick = function (ev) {
+        pageLayer.changeStatus(this);
+      };
+      buttonDIV.appendChild(lockButton);
+
+      var nextButton = document.createElement("INPUT");
+      nextButton.addClassName("button");
+      nextButton.style.width = "50px";
+      nextButton.value = "→";
+      nextButton.setAttribute("type", "button");
+      nextButton.onclick = function (ev) {
+        pageLayer.changeLayer(1);
+      };
+      buttonDIV.appendChild(nextButton);
+    };
+
+    function initPage(data) {
+      return new PageLayer(data)
+    }
+  </script>
+</head>
+<body>
+<script type="text/javascript">
+  var data = [
+  {type: 1, links: [ {url: "url", , reflushTime: -1,zoom:1.2}]}
+//{
+// type: 4, links: [
+//   {url: "url", reflushTime: 30000},
+//   {url: "url", reflushTime: 30000,zoom:1.2},
+//   {url: "url", reflushTime: 30000,zoom:1.2},
+//   {url: "url", reflushTime: 30000,zoom:1.2}
+//       ]
+//     },
+
+  ];
+
+  window.onload = function (e) {
+    initPage(data);
+  }
+</script>
+</body>
+</html>
